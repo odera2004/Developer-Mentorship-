@@ -4,81 +4,108 @@ from datetime import datetime
 
 db = SQLAlchemy()
 
-class User(db.Model):  # For Flask-SQLAlchemy
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
-    Role = db.Column(db.String(100), nullable=False)
-    user_type = db.Column(db.Enum('mentor', 'mentee', name='user_type_enum'), nullable=False)
-    profile_picture = db.Column(db.String(255), default='default.png')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Mentor-specific fields
-    skills = db.Column(db.Text)  # Comma-separated list
-    experience = db.Column(db.String(255))
-    availability = db.Column(db.Text)  # JSON structure: {'monday': '9AM-5PM', 'tuesday': '10AM-4PM'}
-
-    # Mentee-specific fields
-    selected_mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Reference mentor
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(50), nullable=False)  # "developer" or "mentor"
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     # Relationships
-    mentor = db.relationship('User', remote_side=[id])  # Self-referential relationship
+    developer = db.relationship('Developer', backref='user', uselist=False, cascade='all, delete-orphan')
+    mentor = db.relationship('Mentor', backref='user', uselist=False, cascade='all, delete-orphan')
 
 
-class Mentorship(db.Model):
+
+class Developer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    mentee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    status = db.Column(db.Enum('pending', 'accepted', 'rejected'), default='pending')
-    payment_status = db.Column(db.Enum('pending', 'completed'), default='pending')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    skills = db.Column(db.JSON)  # List of skills (e.g., ["Python", "JavaScript"])
+    goals = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     # Relationships
-    mentee = db.relationship('User', foreign_keys=[mentee_id])
-    mentor = db.relationship('User', foreign_keys=[mentor_id])
+    sessions = db.relationship('Session', backref='developer', cascade='all, delete-orphan')
 
-class Payment(db.Model):
+
+class Mentor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    mentee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
-    payment_status = db.Column(db.Enum('pending', 'completed', 'failed'), default='pending')
-    transaction_id = db.Column(db.String(255), unique=True, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    bio = db.Column(db.Text)
+    skills = db.Column(db.JSON)  # List of skills (e.g., ["React", "Node.js"])
+    experience = db.Column(db.Integer)
+    hourly_rate = db.Column(db.Float)
+    availability = db.Column(db.JSON)  # JSON structure for availability
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-    mentee = db.relationship('User', foreign_keys=[mentee_id])
-    mentor = db.relationship('User', foreign_keys=[mentor_id])
-
-
-class Chat(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    mentee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'), nullable=False)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    message_text = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class CodeReview(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    mentee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    code_snippet = db.Column(db.Text, nullable=False)
-    feedback = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Relationships
+    sessions = db.relationship('Session', backref='mentor', cascade='all, delete-orphan')
 
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    mentee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    session_time = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.Enum('scheduled', 'completed', 'canceled'), default='scheduled')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    developer_id = db.Column(db.Integer, db.ForeignKey('developer.id'), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    duration = db.Column(db.Integer, nullable=False)  # Duration in minutes
+    status = db.Column(db.String(50), nullable=False)  # "pending", "accepted", "completed", "cancelled"
+    payment_status = db.Column(db.String(50), nullable=False)  # "pending", "paid", "refunded"
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+    # Relationships
+    messages = db.relationship('Message', backref='session', cascade='all, delete-orphan')
+    payment = db.relationship('Payment', backref='session', uselist=False, cascade='all, delete-orphan')
+    review = db.relationship('Review', backref='session', uselist=False, cascade='all, delete-orphan')
+
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=True)  # Optional
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+    is_read = db.Column(db.Boolean, default=False)
+
+    # Relationships
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+
+
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    payment_method = db.Column(db.String(50), nullable=False)  # e.g., "Stripe", "PayPal"
+    transaction_id = db.Column(db.String(120), nullable=False)  # Unique ID from payment gateway
+    status = db.Column(db.String(50), nullable=False)  # "pending", "success", "failed"
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
+    developer_id = db.Column(db.Integer, db.ForeignKey('developer.id'), nullable=False)
+    mentor_id = db.Column(db.Integer, db.ForeignKey('mentor.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)  # Rating from 1 to 5
+    comment = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    actor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # User who performed the action
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # e.g., "session_request", "message", "payment"
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    actor = db.relationship('User', foreign_keys=[actor_id])  # User who performed the action
+
+
+    # Relationships
+    user = db.relationship('User', backref='notifications')
