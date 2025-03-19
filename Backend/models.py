@@ -47,6 +47,7 @@ class Mentor(db.Model):
     sessions = db.relationship('Session', backref='mentor', cascade='all, delete-orphan')
 
 
+
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     developer_id = db.Column(db.Integer, db.ForeignKey('developer.id'), nullable=False)
@@ -64,6 +65,7 @@ class Session(db.Model):
     review = db.relationship('Review', backref='session', uselist=False, cascade='all, delete-orphan')
 
 
+
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -78,6 +80,7 @@ class Message(db.Model):
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
 
+
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('session.id'), nullable=False)
@@ -86,6 +89,7 @@ class Payment(db.Model):
     transaction_id = db.Column(db.String(120), nullable=False)  # Unique ID from payment gateway
     status = db.Column(db.String(50), nullable=False)  # "pending", "success", "failed"
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -96,16 +100,22 @@ class Review(db.Model):
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    actor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # User who performed the action
+    actor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # User who performed the action
     message = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(50), nullable=False)  # e.g., "session_request", "message", "payment"
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     actor = db.relationship('User', foreign_keys=[actor_id])  # User who performed the action
 
-
     # Relationships
     user = db.relationship('User', backref='notifications')
+
+
+class TokenBlocklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, nullable=False)
