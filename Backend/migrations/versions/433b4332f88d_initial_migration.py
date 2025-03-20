@@ -1,8 +1,8 @@
-"""Initial migration.
+"""Initial migration
 
-Revision ID: 1a98c7134dd3
+Revision ID: 433b4332f88d
 Revises: 
-Create Date: 2025-03-19 10:30:34.392384
+Create Date: 2025-03-20 12:47:40.701248
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1a98c7134dd3'
+revision = '433b4332f88d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,36 +29,24 @@ def upgrade():
 
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
-    sa.Column('password', sa.String(length=120), nullable=False),
+    sa.Column('password', sa.String(length=512), nullable=False),
     sa.Column('role', sa.String(length=50), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('isadmin', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('email')
-    )
-    op.create_table('developer',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=120), nullable=False),
-    sa.Column('skills', sa.JSON(), nullable=True),
-    sa.Column('goals', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
     )
     op.create_table('mentor',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=120), nullable=False),
+    sa.Column('username', sa.String(length=120), nullable=False),
     sa.Column('bio', sa.Text(), nullable=True),
     sa.Column('skills', sa.JSON(), nullable=True),
     sa.Column('experience', sa.Integer(), nullable=True),
     sa.Column('hourly_rate', sa.Float(), nullable=True),
     sa.Column('availability', sa.JSON(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -82,9 +70,7 @@ def upgrade():
     sa.Column('duration', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=50), nullable=False),
     sa.Column('payment_status', sa.String(length=50), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['developer_id'], ['developer.id'], ),
+    sa.ForeignKeyConstraint(['developer_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['mentor_id'], ['mentor.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -120,7 +106,7 @@ def upgrade():
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('comment', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['developer_id'], ['developer.id'], ),
+    sa.ForeignKeyConstraint(['developer_id'], ['user.id'], ),
     sa.ForeignKeyConstraint(['mentor_id'], ['mentor.id'], ),
     sa.ForeignKeyConstraint(['session_id'], ['session.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -136,7 +122,6 @@ def downgrade():
     op.drop_table('session')
     op.drop_table('notification')
     op.drop_table('mentor')
-    op.drop_table('developer')
     op.drop_table('user')
     with op.batch_alter_table('token_blocklist', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_token_blocklist_jti'))

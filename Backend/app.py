@@ -2,6 +2,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from models import db,TokenBlocklist
 from flask_cors import CORS
+from datetime import timedelta
+from flask_jwt_extended import JWTManager
+
 
 
 app = Flask(__name__)
