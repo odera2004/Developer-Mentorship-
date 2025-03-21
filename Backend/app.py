@@ -24,7 +24,8 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] =  timedelta(hours=1)
 jwt = JWTManager(app)
 jwt.init_app(app)
 
-
+from views import *
+app.register_blueprint(message_bp)
 
 
 # Callback function to check if a JWT exists in the database blocklist
