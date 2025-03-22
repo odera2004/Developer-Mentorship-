@@ -4,7 +4,6 @@ from datetime import datetime
 
 metadata = MetaData()
 db = SQLAlchemy(metadata=metadata)
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -12,8 +11,8 @@ class User(db.Model):
     password = db.Column(db.String(512), nullable=False)
     role = db.Column(db.String(50), nullable=False)  # "developer" or "mentor"
     isadmin = db.Column(db.Boolean, default=False, nullable=True)
+    phone_number = db.Column(db.String(15), unique=True, nullable=True)  # New field added
     
-   
     mentor = db.relationship('Mentor', backref='user', uselist=False, cascade='all, delete-orphan')
 
 
@@ -84,17 +83,16 @@ class Review(db.Model):
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    actor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # User who performed the action
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # The recipient
+    actor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # The user who performed the action
     message = db.Column(db.Text, nullable=False)
     type = db.Column(db.String(50), nullable=False)  # e.g., "session_request", "message", "payment"
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    actor = db.relationship('User', foreign_keys=[actor_id])  # User who performed the action
 
-    # Relationships
-    user = db.relationship('User', backref='notifications')
-
+    # Explicit relationships to avoid ambiguity
+    user = db.relationship('User', foreign_keys=[user_id], backref='notifications_received')  # Recipient
+    actor = db.relationship('User', foreign_keys=[actor_id], backref='notifications_sent')  # Sender/Actor
 
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)

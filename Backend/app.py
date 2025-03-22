@@ -6,7 +6,6 @@ from datetime import timedelta
 from flask_jwt_extended import JWTManager
 
 
-
 app = Flask(__name__)
 
 CORS(app)
@@ -14,8 +13,6 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lost.db'
 migrate = Migrate(app, db)
 db.init_app(app)
-
-
 
 # Jwt
 app.config["JWT_SECRET_KEY"] = "dgsjfgfgfeyyeyud" 
@@ -26,6 +23,13 @@ jwt.init_app(app)
 
 from views import *
 app.register_blueprint(message_bp)
+app.register_blueprint(user_bp)
+app.register_blueprint(Session_bp)
+app.register_blueprint(Payment_bp)
+app.register_blueprint(notification_bp)
+app.register_blueprint(Review_bp)
+app.register_blueprint(mentor_bp)
+app.register_blueprint(auth_bp)
 
 
 # Callback function to check if a JWT exists in the database blocklist
@@ -35,7 +39,3 @@ def check_if_token_revoked(jwt_header, jwt_payload: dict) -> bool:
     token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
 
     return token is not None
-
-
-if __name__ == '__main__':
-    app.run(debug=True)

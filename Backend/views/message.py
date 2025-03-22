@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from app import db
-from models import Message, User, Session
+from models import Message
 
 message_bp = Blueprint('message_bp', __name__)
 
