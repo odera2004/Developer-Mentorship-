@@ -1,23 +1,23 @@
-import { Routes,Route} from 'react-router-dom'
-import './App.css'
-import Navbar from './components/Navbar'
-import Home from './pages/Homepage'
-import Landingpage from './components/Landingpage'
+import { Routes,Route, BrowserRouter} from 'react-router-dom'
+import Layout from './components/Layout'
+import Home from './pages/Home'
 
 function App() {
   
 
   return (
-    <><Navbar/>
-    <Landingpage/>
-    <Routes>
-      <Route exact path="/" element={<Home />} />
+    <BrowserRouter>
+      <Routes>
+        <Route>
+          <Route path='/' element={<Layout/>}>
+          <Route index element={<Home/>}/>
 
-    </Routes>
-    </>
-    
+          </Route>
+        </Route>
+      </Routes>
+    </BrowserRouter>
     
   )
 }
 
-export default App
+export default App;
