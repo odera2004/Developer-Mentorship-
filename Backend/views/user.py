@@ -13,6 +13,10 @@ def create_user():
     
     if existing_user:
         return jsonify({"error": "Username already exists"}), 400  # Handle duplicate username
+    
+    phone_number = data.get('phone_number')
+    if not phone_number:
+          return jsonify({'error': 'Phone number is required'}), 400
 
     user = User(
         username=data['username'],
@@ -26,7 +30,7 @@ def create_user():
     db.session.commit()
     return jsonify({'message': 'User created successfully', 'id': user.id}), 201
 
-@user_bp.route('/users/<int:user_id>', methods=['GET'])
+@user_bp.route('/users', methods=['GET'])
 def get_user(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -40,7 +44,7 @@ def get_user(user_id):
         'isadmin': user.isadmin
     })
 
-@user_bp.route('/users/<int:user_id>', methods=['PUT'])
+@user_bp.route('/users', methods=['PUT'])
 def update_user(user_id):
     data = request.get_json()
     user = User.query.get(user_id)
@@ -53,7 +57,7 @@ def update_user(user_id):
     db.session.commit()
     return jsonify({'message': 'User updated successfully'})
 
-@user_bp.route('/users/<int:user_id>', methods=['DELETE'])
+@user_bp.route('/users', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get(user_id)
     if not user:

@@ -4,11 +4,16 @@ from models import db,TokenBlocklist
 from flask_cors import CORS
 from datetime import timedelta
 from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+load_dotenv()
 
 
 app = Flask(__name__)
+# init_oauth(app)
 
-CORS(app)
+
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
 # migration initialization
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///lost.db'
 migrate = Migrate(app, db)
@@ -30,6 +35,8 @@ app.register_blueprint(notification_bp)
 app.register_blueprint(Review_bp)
 app.register_blueprint(mentor_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(paypal_bp)
+app.register_blueprint(assignments_bp)
 
 
 # Callback function to check if a JWT exists in the database blocklist
