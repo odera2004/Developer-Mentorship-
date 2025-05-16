@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 # migration initialization
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://dev_db_6e9t_user:LYnDoEffC88zj4G6xX1QPrynlt8FjawK@dpg-d0j2gqali9vc73bf78fg-a.oregon-postgres.render.com/dev_db_6e9t'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mentors_1_user:4ixivlPXC5gknRgV5FZpHsyqCmrq5I8F@dpg-d0jf9s63jp1c739s45p0-a.oregon-postgres.render.com/mentors_1'
 migrate = Migrate(app, db)
 db.init_app(app)
 
