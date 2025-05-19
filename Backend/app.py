@@ -21,7 +21,7 @@ cloudinary.config(
   api_secret = "6PsQLgZLIq90t7SP_ZQPAZvwHPY"
 )
 
-CORS(app, resources={r"/*": {"origins": "https://developer-mentorship-3.onrender.com"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "https://devmentorsip.vercel.app/"}}, supports_credentials=True)
 
 
 
