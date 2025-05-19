@@ -22,7 +22,7 @@ const MentorProfileModal = ({
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5001/token", {
+      const res = await axios.post("https://developer-mentorship-3.onrender.com/token", {
         phone,
         amount: mentor.hourly_rate, // dynamically use mentor's set rate
       });
@@ -48,11 +48,12 @@ const MentorProfileModal = ({
 
         <div className="relative bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 rounded-2xl max-w-md mx-auto p-8 shadow-2xl ring-1 ring-gray-200 dark:ring-gray-700 transition-all duration-300">
           <div className="flex flex-col items-center">
-            <img
-              src={`http://localhost:5000${mentor.image_url}`}
-              alt={mentor.username}
-              className="w-24 h-24 rounded-full object-cover mb-4 shadow-md"
-            />
+          <img
+  src={mentor.image_url}
+  alt={mentor.username}
+  className="w-24 h-24 rounded-full object-cover mb-4 shadow-md"
+/>
+
             <h2 className="text-2xl font-bold mb-1 dark:text-white text-gray-800">{mentor.username}</h2>
             <p className="text-gray-600 dark:text-gray-300 text-center mb-2">{mentor.bio}</p>
 
@@ -116,7 +117,9 @@ const MentorProfileModal = ({
           className="w-full p-2 mb-3 border rounded"
           required
         />
-        <p className="mb-3 text-gray-800">Amount to Pay: Ksh {mentor.hourly_rate}</p>
+        <p className="mb-3 text-gray-800">
+          Amount to Pay: Ksh {mentor.hourly_rate}
+        </p>
 
         <button
           type="submit"
@@ -125,31 +128,32 @@ const MentorProfileModal = ({
         >
           {loading ? "Processing..." : "Pay & Assign"}
         </button>
-        <p className="mb-3 text-gray-800">Amount to Pay: Ksh {mentor.hourly_rate}</p>
-
-{/* PayPal Button */}
-<div className="mb-4">
-  <PaypalButton
-    amount={mentor.hourly_rate}
-    onSuccess={() => {
-      alert("PayPal payment successful!");
-      onAssignSuccess(mentor.id);
-      setShowPaymentModal(false);
-      onClose();
-    }}
-  />
-</div>
-        <button
-          onClick={() => setShowPaymentModal(false)}
-          type="button"
-          className="mt-2 w-full text-gray-500"
-        >
-          Cancel
-        </button>
       </form>
+
+      {/* ✅ Move PayPal outside the <form> to prevent duplication on input change */}
+      <div className="my-4">
+        <PaypalButton
+          amount={mentor.hourly_rate}
+          onSuccess={() => {
+            alert("PayPal payment successful!");
+            onAssignSuccess(mentor.id);
+            setShowPaymentModal(false);
+            onClose();
+          }}
+        />
+      </div>
+
+      <button
+        onClick={() => setShowPaymentModal(false)}
+        type="button"
+        className="mt-2 w-full text-gray-500"
+      >
+        Cancel
+      </button>
     </div>
   </div>
 )}
+
 
       </div>
     </Dialog>

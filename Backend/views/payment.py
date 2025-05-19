@@ -44,3 +44,12 @@ def delete_payment(payment_id):
     db.session.delete(payment)
     db.session.commit()
     return jsonify({'message': 'Payment deleted successfully'})
+
+
+@Payment_bp.route('/mpesa/callback', methods=['POST'])
+def mpesa_callback():
+    data = request.get_json()
+    print("Callback received:", data)
+    # process the transaction result here
+    return jsonify({'message': 'Callback received'}), 200
+

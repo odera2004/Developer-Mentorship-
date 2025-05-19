@@ -15,7 +15,7 @@ const BecomeMentorModal = ({ isOpen, onClose, userId, onMentorAdded }) => {
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value ,files } = e.target;
     setFormData({
       ...formData,
       [name]: files ? files[0] : value,
