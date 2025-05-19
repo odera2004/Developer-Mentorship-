@@ -6,13 +6,24 @@ from datetime import timedelta
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 load_dotenv()
+import cloudinary
+import cloudinary.uploader
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 # init_oauth(app)
 
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
+
+cloudinary.config(
+  cloud_name = "do0mtxjce",
+  api_key = "956229895997918",
+  api_secret = "6PsQLgZLIq90t7SP_ZQPAZvwHPY"
+)
+
+CORS(app, resources={r"/*": {"origins": "https://developer-mentorship-3.onrender.com"}}, supports_credentials=True)
+
+
 
 # migration initialization
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mentors_1_user:4ixivlPXC5gknRgV5FZpHsyqCmrq5I8F@dpg-d0jf9s63jp1c739s45p0-a.oregon-postgres.render.com/mentors_1'

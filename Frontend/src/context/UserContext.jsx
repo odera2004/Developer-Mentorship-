@@ -15,7 +15,7 @@ export function UserProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('https://developer-mentorship-3.onrender.com/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -40,7 +40,7 @@ export function UserProvider({ children }) {
 
   const register = async (username, email, password, role, phone_number) => {
     try {
-      const response = await fetch('http://localhost:5000/users', {
+      const response = await fetch('https://developer-mentorship-3.onrender.com/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -70,7 +70,7 @@ export function UserProvider({ children }) {
   
     if (token) {
       try {
-        await fetch('http://localhost:5000/logout', {
+        await fetch('https://developer-mentorship-3.onrender.com/logout', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
