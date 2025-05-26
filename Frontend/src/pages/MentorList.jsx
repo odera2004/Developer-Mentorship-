@@ -38,7 +38,7 @@ const MentorList = ({ mentors, currentUserId }) => {
           onClick={() => openModal(mentor)}
         >
           <img
-            src={`https://developer-mentorship-3.onrender.com${mentor.image_url}`}
+            src={`http://localhost:5000${mentor.image_url}`}
             alt={mentor.username}
             className="w-16 h-16 rounded-full mx-auto mb-2 object-cover"
           />

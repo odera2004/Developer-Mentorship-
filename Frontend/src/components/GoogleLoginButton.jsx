@@ -8,7 +8,7 @@ export default function GoogleLoginButton() {
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      const res = await fetch('https://developer-mentorship-3.onrender.com/google', {
+      const res = await fetch('http://localhost:5000/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),

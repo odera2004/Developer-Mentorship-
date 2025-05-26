@@ -9,7 +9,7 @@ export const MentorProvider = ({ children }) => {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const BASE_URL = "https://developer-mentorship-3.onrender.com";
+  const BASE_URL = "http://localhost:5000";
 
   // Fetch all mentors
   const fetchMentors = async () => {

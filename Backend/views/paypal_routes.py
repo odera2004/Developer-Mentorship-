@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint,jsonify, request
 from dotenv import load_dotenv
 
 load_dotenv()
